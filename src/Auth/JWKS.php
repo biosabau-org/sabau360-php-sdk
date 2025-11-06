@@ -22,6 +22,22 @@ class JWKS
      */
     protected static array $keys = [];
 
+    /**
+     * 
+     * @var string
+     */
+    public readonly string $host;
+
+
+    /**
+     * 
+     * @param string $host
+     */
+    public function __construct(string $host = 'https://auth.sabau360.net/')
+    {
+        $this->host = trim(rtrim($host, "/"));
+    }
+
 
     /**
      * 
@@ -38,10 +54,7 @@ class JWKS
 
         self::$keys = [];
 
-        $host = 'https://auth.sabau360.net/';
-
-        $host = trim(rtrim($host, "/"));
-        $url = "{$host}/.well-known/jwks.json";
+        $url = "{$this->host}/.well-known/jwks.json";
 
         $data = file_get_contents($url);
         $data = json_decode($data, true);

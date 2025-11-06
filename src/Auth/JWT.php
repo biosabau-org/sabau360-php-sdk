@@ -34,11 +34,20 @@ class JWT
 
     /**
      * 
-     * @param string $token
+     * @var JWKS
      */
-    public function __construct(string $token)
+    protected JWKS $jwks;
+
+
+    /**
+     * 
+     * @param string $token
+     * @param mixed $jwks
+     */
+    public function __construct(string $token, ?JWKS $jwks = null)
     {
         $this->token = $token;
+        $this->jwks = $jwks ?? new JWKS();
         $this->data = $this->chechToken($token);
     }
 
@@ -118,7 +127,7 @@ class JWT
      */
     protected function getPublicKeys(): array
     {
-        return (new JWKS())->getPublicKeys();
+        return $this->jwks->getPublicKeys();
     }
 
 
