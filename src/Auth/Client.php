@@ -71,7 +71,7 @@ class Client
 
     /**
      * 
-     * @throws \RuntimeException
+     * @throws InvalidTokenException
      * @return Token
      */
     public function getToken(string $code, ?string $state = null): Token
@@ -82,14 +82,34 @@ class Client
 
         if (hash_equals(($token['nonce'] ?? ''), $this->nonce) !== true) {
 
-            throw new \RuntimeException("Invalid or losted nonce value in token.");
+            throw new InvalidTokenException("Invalid or losted nonce value in token.");
         }
 
         if ($state || $this->state) {
-            if (hash_equals($state, $this->state) !== true) {
+            if (hash_equals((string)$state, (string)$this->state) !== true) {
 
-                throw new \RuntimeException("Invalid or losted state value");
+                throw new InvalidTokenException("Invalid or losted state value");
             }
+        }
+
+        if (!$result->isValid()) {
+
+            throw new InvalidTokenException("Invalid token");
+        }
+
+        return $result;
+
+    }
+
+
+
+    public function refreshToken(string $refresh_token): Token {
+
+        $result = new Token($refresh_token, 'refresh_token');
+
+        if (!$result->isValid()) {
+
+            throw new InvalidTokenException("Invalid token");
         }
 
         return $result;

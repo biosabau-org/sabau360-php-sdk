@@ -21,6 +21,7 @@ class Token
      * @var string
      */
     protected string $code;
+    protected string $grant_type;
 
     /**
      * 
@@ -30,13 +31,16 @@ class Token
     protected JWT|null $id_token;
     protected JWT|null $access_token;
 
+
     /**
      * 
      * @param string $code
+     * @param mixed $grant_type
      */
-    public function __construct(string $code)
+    public function __construct(string $code, $grant_type = 'authorization_code')
     {
         $this->code = $code;
+        $this->grant_type = $grant_type;
         $this->raw = $this->fetchToken();
         $this->id_token = (new JWT($this->raw['id_token']));
         $this->access_token = (new JWT($this->raw['access_token']));
@@ -69,14 +73,14 @@ class Token
 
     /**
      * 
-     * @throws \RuntimeException
+     * @throws InvalidTokenException
      * @return string
      */
     public function getTokenType(): string
     {
 
         if (empty($this->raw['token_type'])) {
-            throw new \RuntimeException("Token type is not available.");
+            throw new InvalidTokenException("Token type is not available.");
         }        
 
         return $this->raw['token_type'];
@@ -85,14 +89,14 @@ class Token
 
     /**
      * 
-     * @throws \RuntimeException
+     * @throws InvalidTokenException
      * @return string
      */
     public function getRefreshToken(): string
     {
 
         if (empty($this->raw['refresh_token'])) {
-            throw new \RuntimeException("Refresh token is not available.");
+            throw new InvalidTokenException("Refresh token is not available.");
         }
 
         return $this->raw['refresh_token'];
@@ -107,10 +111,24 @@ class Token
     protected function fetchToken(): array
     {
         $url = 'https://auth.sabau360.net/api/token';
-        $postData = http_build_query([
-            'grant_type' => 'authorization_code',
+        $data = [
+            'grant_type' => $this->grant_type,
             'code' => $this->code,
-        ]);
+        ];
+
+        if ($data['grant_type'] == 'refresh_token') {
+            $data = [
+                'grant_type' => $this->grant_type,
+                'refresh_token' => $this->code,
+            ];
+
+        }
+
+        $postData = http_build_query($data);
+
+
+
+        // dd($postData);
 
         $ch = curl_init($url);
 
