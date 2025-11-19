@@ -1,0 +1,24 @@
+name: Upload wiki files to Toba
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Upload wiki files to Toba
+        env:
+          TOBA_API_TOKEN: ${{ secrets.TOBA_API_TOKEN }}
+        run: php .github/scripts/upload_wiki.php --id=sdk-php --host=meta.sabau360.net
