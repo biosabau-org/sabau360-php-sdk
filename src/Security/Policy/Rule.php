@@ -64,6 +64,13 @@ class Rule
      */
     public const SUP_ADMIN = 'sup-admin';
 
+
+    /**
+     * The development observer.
+     * @var string
+     */
+    public const DEV_VIEWER = 'dev-viewer';
+
     /**
      * Developer who can contribute code, create branches, and propose changes.
      * @var string
